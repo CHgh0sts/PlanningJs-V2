@@ -1,6 +1,4 @@
 "use client";
 export default function ConfirmEmail() {
-  return (
-    <h1>Confirmation d'email</h1>
-  );
+  return <h1>Confirmation d&apos;email</h1>;
 }

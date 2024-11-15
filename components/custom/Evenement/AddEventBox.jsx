@@ -197,6 +197,7 @@ export const AddEventBox = () => {
     }
     setEndDateTimeChange(rearengedTimeEnd);
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!addEventConfig) {
       setTitle("");
@@ -208,6 +209,7 @@ export const AddEventBox = () => {
     setStartDateTimeChange(addEventConfig?.debutTime);
     setEndDateTimeChange(addEventConfig?.finTime);
   }, [addEventConfig]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setAvailableUsers(
       listUsers.filter(
@@ -460,7 +462,7 @@ export const AddEventBox = () => {
             >
               Annuler
             </Button>
-            <Button type="submit">Ajouter l'événement</Button>
+            <Button type="submit">Ajouter l&apos;événement</Button>
           </DialogFooter>
         </form>
       </DialogContent>

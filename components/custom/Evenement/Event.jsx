@@ -225,6 +225,7 @@ export const Event = ({ ...props }) => {
 
     recupEvents();
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);

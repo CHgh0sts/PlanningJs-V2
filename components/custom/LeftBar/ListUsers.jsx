@@ -55,7 +55,7 @@ export const ListUser = () => {
       setListUsers([]);
     }
   };
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log(me);
     if (me) {

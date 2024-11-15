@@ -12,6 +12,7 @@ import { EditEventBox } from "@/components/custom/Evenement/EditEventBox";
 
 export const Callendar = () => {
   const { typeView, setListEvents, actualDate } = useContext(GlobalContext);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const claimEventsList = async () => {
       const firstDayOfMonth = new Date(

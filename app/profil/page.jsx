@@ -53,7 +53,7 @@ export default function Profile() {
       router.push("/login");
     }
   };
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     verifyToken();
   }, []);
@@ -167,7 +167,9 @@ export default function Profile() {
         {isEditing ? (
           <>
             <div className="mb-4">
-              <label className="block text-gray-700">Nom d'utilisateur</label>
+              <label className="block text-gray-700">
+                Nom d&apos;utilisateur
+              </label>
               <Input
                 name="username"
                 value={editableUser.username}

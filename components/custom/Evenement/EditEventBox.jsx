@@ -223,7 +223,7 @@ export const EditEventBox = () => {
     }
     setEndDateTimeChange(rearengedTimeEnd);
   }
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!editEventConfig) {
       setTitle("");
@@ -238,7 +238,7 @@ export const EditEventBox = () => {
     setStartDateTimeChange(editEventConfig?.debutTime);
     setEndDateTimeChange(editEventConfig?.finTime);
   }, [editEventConfig]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setAvailableUsers(
       listUsers.filter(
@@ -493,9 +493,9 @@ export const EditEventBox = () => {
               variant="destructive"
               onClick={(e) => deleteEvent(e, editEventConfig)}
             >
-              Supprimer l'événement
+              Supprimer l&apos;événement
             </Button>
-            <Button type="submit">Modifer l'événement</Button>
+            <Button type="submit">Modifer l&apos;événement</Button>
           </DialogFooter>
         </form>
       </DialogContent>

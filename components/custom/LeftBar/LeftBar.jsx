@@ -79,6 +79,7 @@ export const LeftBar = () => {
       setActualDate(updatedDate);
     }
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const searchListUser = async () => {
       await recupListUser();

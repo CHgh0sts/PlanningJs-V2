@@ -86,7 +86,7 @@ export const CallendarTopBar = () => {
 
     return `de ${formatDate(startOfWeek)} au ${formatDate(endOfWeek)}`;
   };
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isMobile) {
       setSaveTypeView(typeView);
@@ -105,7 +105,7 @@ export const CallendarTopBar = () => {
           onClick={() => setActualDate(new Date())}
           className="btn btn-icon inDay"
         >
-          Aujourd'hui
+          Aujourd&apos;hui
         </Button>
         <Button
           variant="secondary"
