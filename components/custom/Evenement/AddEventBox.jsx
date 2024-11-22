@@ -42,6 +42,7 @@ export const AddEventBox = () => {
 
   const [title, setTitle] = useState(addEventConfig?.title);
   const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
 
   const [isFullDay, setIsFullDay] = useState(false);
   const [selectedUser, setSelectedUser] = useState(
@@ -234,40 +235,34 @@ export const AddEventBox = () => {
             <div className="grid gap-4 py-4">
               <div>
                 <Label htmlFor="title">Titre</Label>
-                <div className="relative flex items-center">
-                  <Input
-                    id="title"
-                    className=""
-                    name="title"
-                    placeholder="Titre de l'événement"
-                    value={title || ""}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
+                <Input
+                  id="title"
+                  name="title"
+                  placeholder="Titre de l'événement"
+                  value={title || ""}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
               </div>
               <div>
                 <Label htmlFor="address">Adresse (facultatif)</Label>
-                <div className="relative flex items-center">
-                  <Input
-                    id="address"
-                    className=""
-                    name="address"
-                    placeholder="Adresse de l'événement"
-                    value={address || ""}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
-                </div>
+                <Input
+                  id="address"
+                  name="address"
+                  placeholder="Adresse de l'événement"
+                  value={address || ""}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <div className="relative">
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Description de l'événement (facultatif)"
-                  />
-                </div>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Description de l'événement (facultatif)"
+                  value={description || ""}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
               </div>
               <Separator />
               <div>
@@ -300,13 +295,13 @@ export const AddEventBox = () => {
                       onValueChange={handleUserSelection}
                     >
                       <SelectTrigger>
-                        <SelectValue>Ajouter des utilisateurs</SelectValue>
+                        <SelectValue placeholder="Ajouter des utilisateurs" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Utilisateurs</SelectLabel>
                           {availableUsers.map((user) => (
-                            <SelectItem key={user.id} value={user.id || ""}>
+                            <SelectItem key={user.id} value={user.id}>
                               <div className="flex items-center">
                                 <div
                                   className="w-4 h-4 rounded-full mr-2"
@@ -322,9 +317,9 @@ export const AddEventBox = () => {
                     <div className="userSelectedBox mt-2 flex w-full">
                       {selectedUsers.map((user) => (
                         <div
-                          style={{ borderColor: user.color, "--c": user.color }}
                           key={user.id}
-                          className={`selectedUser flex items-center space-x-2`}
+                          style={{ borderColor: user.color }}
+                          className="selectedUser flex items-center space-x-2"
                         >
                           <span>{user.username}</span>
                           <Button
@@ -353,7 +348,7 @@ export const AddEventBox = () => {
                       }}
                     >
                       <SelectTrigger>
-                        <SelectValue>
+                        <SelectValue placeholder="Sélectionner un utilisateur">
                           <div className="flex items-center">
                             <div
                               className="w-4 h-4 rounded-full mr-2"
@@ -361,8 +356,7 @@ export const AddEventBox = () => {
                                 backgroundColor: selectedUser?.color || "#000",
                               }}
                             ></div>
-                            {selectedUser?.username ||
-                              "Sélectionner un utilisateur"}
+                            {selectedUser?.username || ""}
                           </div>
                         </SelectValue>
                       </SelectTrigger>
@@ -370,7 +364,7 @@ export const AddEventBox = () => {
                         <SelectGroup>
                           <SelectLabel>Utilisateurs</SelectLabel>
                           {listUsers.map((user) => (
-                            <SelectItem key={user.id} value={user.id || ""}>
+                            <SelectItem key={user.id} value={user.id}>
                               <div className="flex items-center">
                                 <div
                                   className="w-4 h-4 rounded-full mr-2"
@@ -401,62 +395,50 @@ export const AddEventBox = () => {
                 <Label htmlFor="fullDay">Journée entière</Label>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center justify-between w-full">
-                  <Label htmlFor="startDate">Date de début</Label>
+                <Label htmlFor="startDate">Date de début</Label>
+                <Input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  required
+                  value={addEventConfig?.debutAt || ""}
+                  onChange={(e) => setDebutAtInput(e.target.value)}
+                />
+                {!isFullDay && (
                   <Input
-                    id="startDate"
-                    className="col-span-3 w-[70%] justify-around mr-2"
-                    name="startDate"
+                    id="debutTime"
+                    name="debutTime"
+                    type="time"
+                    required
+                    value={startDateTimeChange}
+                    onChange={(e) => setStartDateTimeChange(e.target.value)}
+                    onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
+                  />
+                )}
+              </div>
+              {!isFullDay && (
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="endDate">Date de fin</Label>
+                  <Input
+                    id="endDate"
+                    name="endDate"
                     type="date"
                     required
-                    value={addEventConfig?.debutAt || ""}
-                    onChange={(e) => setDebutAtInput(e.target.value)}
+                    value={addEventConfig?.finAt || ""}
+                    onChange={(e) => setFinAtInput(e.target.value)}
+                    min={addEventConfig?.debutAt}
+                  />
+                  <Input
+                    id="finTime"
+                    name="finTime"
+                    type="time"
+                    required
+                    value={endDateTimeChange}
+                    onChange={(e) => setEndDateTimeChange(e.target.value)}
+                    onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
                   />
                 </div>
-                {!isFullDay && (
-                  <div>
-                    <Input
-                      id="debutTime"
-                      name="debutTime"
-                      type="time"
-                      required
-                      value={startDateTimeChange}
-                      onChange={(e) => setStartDateTimeChange(e.target.value)}
-                      onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                {!isFullDay && (
-                  <>
-                    <div className="flex items-center justify-between w-full">
-                      <Label htmlFor="endDate">Date de fin</Label>
-                      <Input
-                        id="endDate"
-                        className="col-span-3 w-[70%] justify-around mr-2"
-                        name="endDate"
-                        type="date"
-                        required
-                        value={addEventConfig?.finAt || ""}
-                        onChange={(e) => setFinAtInput(e.target.value)}
-                        min={addEventConfig?.debutAt}
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        id="finTime"
-                        name="finTime"
-                        type="time"
-                        required
-                        value={endDateTimeChange}
-                        onChange={(e) => setEndDateTimeChange(e.target.value)}
-                        onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
+              )}
             </div>
             <DialogFooter>
               <Button

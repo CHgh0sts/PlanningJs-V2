@@ -1,7 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
+
+const generateRandomPassword = (longueur = 8) => {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let chaine = '';
+  for (let i = 0; i < longueur; i++) {
+      chaine += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+  }
+  return chaine;
+}
 
 export async function GET(req) {
   try {
@@ -55,7 +65,7 @@ export async function POST(request) {
       data: {
         username,
         color,
-        role: "user",
+        role: "1",
         temp_password: hashedTempPassword,
       },
     });

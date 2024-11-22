@@ -33,7 +33,6 @@ export const CreateUser = ({ isOpen, onClose }) => {
           color,
         }),
       });
-
       if (!res.ok)
         throw new Error("Erreur lors de la création de l'utilisateur");
 
@@ -43,9 +42,10 @@ export const CreateUser = ({ isOpen, onClose }) => {
       setUserCreated(true);
       setErrorMessage("");
 
-      setListUsers([...listUsers, { id: data.userId, username, color }]); // Ajoute le nouvel utilisateur dans ListUsers
+      setListUsers([...listUsers, data]);
+      console.log(listUsers);
     } catch (error) {
-      setErrorMessage("Erreur lors de la création de l'utilisateur");
+      setErrorMessage("Erreur lors de l'ajout de l'utilisateur");
       setSuccessMessage("");
     }
   };

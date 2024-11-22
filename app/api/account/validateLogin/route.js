@@ -2,16 +2,20 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
+import { parse } from 'cookie';
 
 const prisma = new PrismaClient();
 
 export async function PUT(req) {
-  const { newPassword, confirmPassword } = await req.json();
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+  // Parse les cookies pour extraire le token
+  const cookies = parse(req.headers.get('cookie') || '');
+  const token = cookies.authToken;
 
   if (!token) {
     return NextResponse.json({ error: 'Token manquant' }, { status: 401 });
   }
+
+  const { newPassword, confirmPassword } = await req.json();
 
   if (newPassword !== confirmPassword) {
     return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });
@@ -36,13 +40,28 @@ export async function PUT(req) {
       },
     });
 
-    const tokenValid = jwt.sign(
-        { userId: updatedUser.id }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: '1h' }
-      );
+    // Générer un nouveau token valide
+    const newToken = jwt.sign(
+      { userId: updatedUser.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    return NextResponse.json({ token: tokenValid, message: 'Mot de passe mis à jour avec succès' }, { status: 200 });
+    // Mettre à jour le cookie avec le nouveau token
+    const response = NextResponse.json(
+      { message: 'Mot de passe mis à jour avec succès' },
+      { status: 200 }
+    );
+
+    response.cookies.set('authToken', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600, // 1 heure
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Erreur lors de la mise à jour du mot de passe :', error);
 
