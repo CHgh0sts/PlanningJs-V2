@@ -1,0 +1,9 @@
+/* Barre de progression personnalisée */
+#nprogress .bar {
+  background: #ff4500; /* Couleur personnalisée (rouge) */
+  height: 4px;
+}
+
+#nprogress .spinner {
+  display: none; /* Cache le spinner par défaut */
+}
