@@ -68,7 +68,7 @@ export const CreateUser = ({ isOpen, onClose }) => {
         {userCreated ? (
           <div className="text-center space-y-4">
             <p className="text-green-500">{successMessage}</p>
-            <p>Nom d'utilisateur : {username}</p>
+            <p>Nom d&apos;utilisateur : {username}</p>
             <p>Mot de passe temporaire : {tempPassword}</p>
             <Button onClick={handleCopyPassword} className="mt-4">
               Copier le mot de passe
@@ -78,7 +78,7 @@ export const CreateUser = ({ isOpen, onClose }) => {
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="grid gap-4 py-4">
               <div className="">
-                <Label htmlFor="username">Nom d'utilisateur</Label>
+                <Label htmlFor="username">Nom d&apos;utilisateur</Label>
                 <Input
                   id="username"
                   name="username"
@@ -104,7 +104,9 @@ export const CreateUser = ({ isOpen, onClose }) => {
               <Button variant="secondary" onClick={onClose}>
                 Annuler
               </Button>
-              <Button onClick={handleCreateUser}>Créer l'utilisateur</Button>
+              <Button onClick={handleCreateUser}>
+                Créer l&apos;utilisateur
+              </Button>
             </DialogFooter>
           </form>
         )}

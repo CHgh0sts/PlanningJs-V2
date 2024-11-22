@@ -57,7 +57,7 @@ export async function PUT(req) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 3600, // 1 heure
+      maxAge: 3600,
       path: '/',
     });
 
@@ -65,7 +65,6 @@ export async function PUT(req) {
   } catch (error) {
     console.error('Erreur lors de la mise à jour du mot de passe :', error);
 
-    // Gestion des erreurs JWT
     if (error.name === 'JsonWebTokenError') {
       return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
     } else if (error.name === 'TokenExpiredError') {

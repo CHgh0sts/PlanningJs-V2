@@ -98,6 +98,7 @@ export const AddEvent = ({ event = null, heureAddEvent }) => {
         (user) => !selectedUsers.some((selected) => selected.id === user.id)
       )
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actualEditDate, usersList, selectedUsers, event]);
 
   const handleStartDateTimeChange = (time) => {

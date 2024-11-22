@@ -32,6 +32,7 @@ export default function Home() {
       }
     };
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -54,8 +55,8 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     fetchMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   if (loading)

@@ -43,6 +43,7 @@ export const Callendar = () => {
       }
     };
     claimEventsList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actualDate, typeView]);
   return (
     <>

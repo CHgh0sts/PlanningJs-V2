@@ -62,6 +62,7 @@ export const ListUser = () => {
       // Attendre que `me` soit chargé
       recupListUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchUser, me]);
 
   return (

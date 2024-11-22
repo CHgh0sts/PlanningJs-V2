@@ -96,6 +96,7 @@ export const CallendarTopBar = () => {
       setTypeView(saveTypeView);
       setLeftBar(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
   return (

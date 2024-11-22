@@ -237,6 +237,7 @@ export const EditEventBox = () => {
     }
     setStartDateTimeChange(editEventConfig?.debutTime);
     setEndDateTimeChange(editEventConfig?.finTime);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editEventConfig]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -245,6 +246,7 @@ export const EditEventBox = () => {
         (user) => !selectedUsers.some((selected) => selected.id === user.id)
       )
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleUsers]);
 
   return (

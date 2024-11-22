@@ -87,6 +87,7 @@ export const LeftBar = () => {
     if (me) {
       searchListUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchUser, me]);
 
   return (
