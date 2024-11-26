@@ -18,12 +18,18 @@ const geistMono = localFont({
 export const metadata = {
   title: "PlanningJs",
   description: "Cree et realiser par CHghosts",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="fr">
-      <link rel="apple-touch-icon" href="/images/favicon.ico" />
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="icon" href="/images/favicon.ico" />
+        <link rel="apple-touch-icon" href="/images/favicon.ico" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
