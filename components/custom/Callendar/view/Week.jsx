@@ -12,6 +12,8 @@ export const Week = () => {
     setListEvents,
     idUserList,
     setAddEventConfig,
+    changeSize,
+    setChangeSize,
   } = useContext(GlobalContext);
   const [calendarData, setCalendarData] = useState([]);
   const offsetYRef = useRef(0);
@@ -37,35 +39,32 @@ export const Week = () => {
       console.error(error);
     }
   };
-  const generateWeekView = async (date) => {
+  const generateWeekView = (date) => {
     const calendarDays = [];
-    const startOfWeek = new Date(date);
-    const today = new Date();
-    const dayOfWeek = startOfWeek.getUTCDay();
-    const difference = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    startOfWeek.setUTCDate(startOfWeek.getUTCDate() + difference);
+    const inputDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    const dayOfWeek = (inputDate.getDay() + 6) % 7;
+    const monday = new Date(inputDate);
+    monday.setUTCDate(inputDate.getUTCDate() - dayOfWeek);
 
     for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(startOfWeek);
-      currentDate.setUTCDate(startOfWeek.getUTCDate() + i);
-
-      const isToday =
-        currentDate.getUTCFullYear() === today.getUTCFullYear() &&
-        currentDate.getUTCMonth() === today.getUTCMonth() &&
-        currentDate.getUTCDate() === today.getUTCDate();
+      const currentDate = new Date(monday);
+      currentDate.setUTCDate(monday.getUTCDate() + i);
 
       calendarDays.push({
         date: currentDate,
         day: currentDate.getUTCDate(),
         weekday: currentDate.toLocaleDateString("fr-FR", { weekday: "long" }),
-        isCurrentMonth: currentDate.getUTCMonth() === date.getUTCMonth(),
-        isToday: isToday,
+        isCurrentMonth: currentDate.getUTCMonth() === inputDate.getUTCMonth(),
+        isToday: currentDate.getTime() === inputDate.getTime(),
         events: [],
       });
     }
 
     return calendarDays;
   };
+
   const renderHourLabels = () => {
     const hours = [];
     for (let i = 0; i < 24; i++) {
@@ -102,24 +101,29 @@ export const Week = () => {
     const diffToMonday = currentDay === 0 ? -6 : 1 - currentDay;
     const firstDayOfWeek = new Date(baseDate);
     firstDayOfWeek.setDate(baseDate.getDate() + diffToMonday);
+
     const lastDayOfWeek = new Date(firstDayOfWeek);
     lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
-    let startDate = firstDayOfWeek.toISOString().split("T")[0];
-    let endDate = lastDayOfWeek.toISOString().split("T")[0];
 
-    const res = await fetch(
-      `/api/events?startDate=${startDate}&endDate=${endDate}`
-    );
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+    lastDayOfWeek.setHours(23, 59, 59, 999);
 
-    if (!res.ok) {
-      console.error(
-        "Erreur lors de la récupération des événements:",
-        res.statusText
-      );
-      return [];
-    }
+    const startDate = firstDayOfWeek.toISOString().split("T")[0];
+    const endDate = lastDayOfWeek.toISOString().split("T")[0];
 
     try {
+      const res = await fetch(
+        `/api/events?startDate=${startDate}&endDate=${endDate}`
+      );
+
+      if (!res.ok) {
+        console.error(
+          "Erreur lors de la récupération des événements:",
+          res.statusText
+        );
+        return [];
+      }
+
       const data = await res.json();
       return data;
     } catch (error) {
@@ -127,6 +131,7 @@ export const Week = () => {
       return [];
     }
   };
+
   const recupEvents = async () => {
     const listEvents = await fetchEvents(actualDate);
     setListEvents(listEvents);
@@ -185,7 +190,7 @@ export const Week = () => {
           : hour
       }:${minutes == 30 ? "00" : "30"}`,
     };
-    setAddEventConfig(configEvent);
+    if (!changeSize) setAddEventConfig(configEvent);
   };
   const handleDrop = async (event, newDay) => {
     const eventId = event.dataTransfer.getData("eventId");
@@ -230,7 +235,8 @@ export const Week = () => {
 
   useEffect(() => {
     if (actualDate) {
-      generateWeekView(actualDate).then(setCalendarData);
+      const weekData = generateWeekView(actualDate);
+      setCalendarData(weekData);
     }
   }, [actualDate]);
 
@@ -251,7 +257,11 @@ export const Week = () => {
               }`}
               onDragOver={handleDragOver}
               onDragStart={(e) => handleDragStart(e)}
-              onDrop={(event) => handleDrop(event, dayInfo.day)}
+              onDrop={(event) =>
+                dayInfo.isCurrentMonth
+                  ? handleDrop(event, dayInfo.day)
+                  : event.preventDefault()
+              }
               onClick={
                 dayInfo.isCurrentMonth
                   ? (event) => handleClick(dayInfo, event)

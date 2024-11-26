@@ -2,9 +2,14 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { GlobalContext } from "@/lib/GlobalState";
 
 export const Event = ({ ...props }) => {
-  const { typeView, listEvents, setListEvents, setEditEventConfig } =
-    useContext(GlobalContext);
-  const [changeSize, setChangeSize] = useState(false);
+  const {
+    typeView,
+    listEvents,
+    setListEvents,
+    setEditEventConfig,
+    changeSize,
+    setChangeSize,
+  } = useContext(GlobalContext);
   const mouseMoveType = useRef(null);
   const offsetYRef = useRef(0);
   const {

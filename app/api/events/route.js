@@ -12,20 +12,23 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Les dates de début et de fin sont requises' }, { status: 400 });
   }
 
+  const start = new Date(`${startDate}T00:00:00Z`);
+  const end = new Date(`${endDate}T23:59:59Z`);
+
   try {
     const events = await prisma.event.findMany({
       where: {
         OR: [
           {
             debutAt: {
-              gte: new Date(startDate),
-              lte: new Date(endDate),
+              gte: start,
+              lte: end,
             },
           },
           {
             finAt: {
-              gte: new Date(startDate),
-              lte: new Date(endDate),
+              gte: start,
+              lte: end,
             },
           }
         ]

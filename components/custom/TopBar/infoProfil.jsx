@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Cookies from "js-cookie";
 
 export const InfoProfil = ({ ...props }) => {
-  const { me, isMobile } = useContext(GlobalContext);
+  const { me, isMobile, verifDroit } = useContext(GlobalContext);
   const router = useRouter();
 
   if (!me) {
@@ -54,7 +54,7 @@ export const InfoProfil = ({ ...props }) => {
         <DropdownMenuItem className="myProfil" onClick={handleProfil}>
           <User /> Mon Profil
         </DropdownMenuItem>
-        {me.listDroits.includes(5) && (
+        {verifDroit(me, [5]) && (
           <DropdownMenuItem className="myProfil" onClick={handleDashboard}>
             <LayoutDashboard /> Dashboard
           </DropdownMenuItem>

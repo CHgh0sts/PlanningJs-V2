@@ -21,7 +21,7 @@ export async function GET(req) {
 
     if (userId) {
       response = await prisma.user.findUnique({
-        where: { id: parseInt(userId, 10) },
+        where: { id: parseInt(userId, 10), exterieur: false },
         select: {
           id: true,
           username: true,
@@ -35,6 +35,7 @@ export async function GET(req) {
       }
     } else {
       response = await prisma.user.findMany({
+        where: { exterieur: false },
         select: {
           id: true,
           username: true,

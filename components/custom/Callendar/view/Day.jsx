@@ -11,6 +11,8 @@ export const Day = () => {
     setListEvents,
     idUserList,
     setAddEventConfig,
+    changeSize,
+    setChangeSize,
   } = useContext(GlobalContext);
   const [calendarData, setCalendarData] = useState([]);
   const offsetYRef = useRef(0);
@@ -149,17 +151,18 @@ export const Day = () => {
   };
   const generateDayView = async (date) => {
     const startOfDay = new Date(date);
-    const currentDate = new Date(startOfDay);
+    const currentDate = new Date();
     const today = new Date();
 
     const isToday =
-      currentDate.getUTCFullYear() === today.getUTCFullYear() &&
-      currentDate.getUTCMonth() === today.getUTCMonth() &&
-      currentDate.getUTCDate() === today.getUTCDate();
+      currentDate.getFullYear() === today.getFullYear() &&
+      currentDate.getMonth() === today.getMonth() &&
+      currentDate.getDate() === today.getDate();
+
     return [
       {
         date: startOfDay,
-        day: startOfDay.getUTCDate(),
+        day: startOfDay.getDate(),
         weekday: currentDate.toLocaleDateString("fr-FR", { weekday: "long" }),
         isCurrentMonth: true,
         isToday,
@@ -167,6 +170,7 @@ export const Day = () => {
       },
     ];
   };
+
   const handleClick = async (dayInfo) => {
     let hour = 0;
     let minutes = 0;
@@ -214,7 +218,7 @@ export const Day = () => {
           : hour
       }:${minutes == 30 ? "00" : "30"}`,
     };
-    setAddEventConfig(configEvent);
+    if (!changeSize) setAddEventConfig(configEvent);
   };
   useEffect(() => {
     if (actualDate) {
@@ -268,11 +272,13 @@ export const Day = () => {
                     idUserInEvent.forEach((id) => {
                       if (idUserList.includes(parseInt(id))) isUser = true;
                     });
+
                     const isSameDay =
-                      eventDate.getUTCFullYear() === dayDate.getUTCFullYear() &&
-                      eventDate.getUTCMonth() === dayDate.getUTCMonth() &&
-                      eventDate.getUTCDate() === dayDate.getUTCDate() &&
+                      eventDate.getFullYear() === dayDate.getFullYear() &&
+                      eventDate.getMonth() === dayDate.getMonth() &&
+                      eventDate.getDate() === dayDate.getDate() &&
                       isUser;
+
                     if (isSameDay) {
                       const eventDebut = new Date(event.debutAt);
                       const eventFin = new Date(event.finAt);
@@ -284,23 +290,23 @@ export const Day = () => {
                             user.push(userInList);
                         });
                       });
+
                       const top =
-                        (eventDebut.getUTCHours() +
-                          eventDebut.getUTCMinutes() / 60) *
+                        (eventDebut.getHours() + eventDebut.getMinutes() / 60) *
                         5;
                       const duration =
                         (eventFin.getTime() - eventDebut.getTime()) /
                         (1000 * 60 * 60);
                       const height = duration * 5;
                       const formattedHour = eventDebut
-                        .getUTCHours()
+                        .getHours()
                         .toString()
                         .padStart(2, "0");
                       const formattedMinutes = eventDebut
-                        .getUTCMinutes()
+                        .getMinutes()
                         .toString()
                         .padStart(2, "0");
-                      //const userIds = event.userId.split('/').map(id => parseInt(id));
+
                       return (
                         <Event
                           style={{

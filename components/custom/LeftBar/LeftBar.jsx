@@ -36,7 +36,7 @@ export const LeftBar = () => {
       let users = [];
 
       for (let userRecup of data.users) {
-        if (!users.some((u) => u.id === userRecup.id)) {
+        if (!users.some((u) => u.id === userRecup.id) && !userRecup.exterieur) {
           users.push(userRecup);
         }
       }

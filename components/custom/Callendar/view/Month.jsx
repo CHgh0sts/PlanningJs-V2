@@ -45,6 +45,7 @@ export const Month = () => {
     const previousMonthLastDay = new Date(
       Date.UTC(date.getFullYear(), date.getMonth(), 0)
     ).getUTCDate();
+
     for (let i = daysBefore; i > 0; i--) {
       calendarDays.push({
         day: previousMonthLastDay - i + 1,
@@ -52,11 +53,13 @@ export const Month = () => {
         events: [],
       });
     }
+
     for (let i = 1; i <= lastDayOfMonth.getUTCDate(); i++) {
       const isToday =
-        i === today.getUTCDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear();
+        today.getFullYear() === date.getFullYear() &&
+        today.getMonth() === date.getMonth() &&
+        today.getDate() === i;
+
       const currentDate = new Date(
         Date.UTC(date.getFullYear(), date.getMonth(), i)
       );
@@ -68,6 +71,7 @@ export const Month = () => {
         events: [],
       });
     }
+
     for (let i = 1; i <= daysAfter; i++) {
       calendarDays.push({
         day: i,
@@ -75,6 +79,7 @@ export const Month = () => {
         events: [],
       });
     }
+
     return calendarDays;
   };
 
@@ -198,7 +203,11 @@ export const Month = () => {
                   : ""
               }`}
               onDragOver={(e) => handleDragOver(e, dayInfo.day)}
-              onDrop={(e) => handleDrop(e, dayInfo.day)}
+              onDrop={(e) =>
+                dayInfo.isCurrentMonth
+                  ? handleDrop(e, dayInfo.day)
+                  : e.preventDefault()
+              }
               onClick={
                 dayInfo.isCurrentMonth
                   ? (event) => handleClick(dayInfo, event)
@@ -219,9 +228,9 @@ export const Month = () => {
                       if (idUserList.includes(parseInt(id))) isUser = true;
                     });
                     return (
-                      eventDate.getUTCFullYear() === dayDate.getUTCFullYear() &&
-                      eventDate.getUTCMonth() === dayDate.getUTCMonth() &&
-                      eventDate.getUTCDate() === dayDate.getUTCDate() &&
+                      eventDate.getFullYear() === dayDate.getFullYear() &&
+                      eventDate.getMonth() === dayDate.getMonth() &&
+                      eventDate.getDate() === dayDate.getDate() &&
                       isUser
                     );
                   })
@@ -237,11 +246,11 @@ export const Month = () => {
                       });
                     });
                     const formattedHour = eventDebut
-                      .getUTCHours()
+                      .getHours()
                       .toString()
                       .padStart(2, "0");
                     const formattedMinutes = eventDebut
-                      .getUTCMinutes()
+                      .getMinutes()
                       .toString()
                       .padStart(2, "0");
                     return (

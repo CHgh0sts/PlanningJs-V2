@@ -33,6 +33,7 @@ model User {
   temp_password  String
   role           String    @default("1")
   color          String
+  exterieur      Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { CreateUser } from "./CreateUser";
+import { CreateUserExterieur } from "./CreateUserExterieur";
 
 export const AddEventBox = () => {
   const { toast } = useToast();
@@ -38,6 +39,8 @@ export const AddEventBox = () => {
     listEvents,
     setListEvents,
     typeView,
+    listUsersForEvent,
+    setListUsersForEvent,
   } = useContext(GlobalContext);
 
   const [title, setTitle] = useState(addEventConfig?.title);
@@ -52,6 +55,8 @@ export const AddEventBox = () => {
   const [multipleUsers, setMultipleUsers] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
+  const [isCreateUserExterieurOpen, setIsCreateUserExterieurOpen] =
+    useState(false);
   const [startDateTimeChange, setStartDateTimeChange] = useState(
     addEventConfig?.debutTime
   );
@@ -120,14 +125,14 @@ export const AddEventBox = () => {
     } catch (error) {
       toast({
         variant: "error",
-        title: "Événement crée",
+        title: "Événement non crée",
         description: "La creation de l'evenement à rencomtré un problème.",
       });
     }
     setAddEventConfig(false);
   };
   const handleUserSelection = (userId) => {
-    const userSelected = listUsers.find((u) => u.id === userId);
+    const userSelected = listUsersForEvent.find((u) => u.id === userId);
     if (
       userSelected &&
       !selectedUsers.some((user) => user.id === userSelected.id)
@@ -200,6 +205,11 @@ export const AddEventBox = () => {
     }
     setEndDateTimeChange(rearengedTimeEnd);
   }
+  function setUserExterieurInEvent(data) {
+    setSelectedUsers([...selectedUsers, data.user]);
+    console.log("dataUser => ", data);
+    setIsCreateUserExterieurOpen(false);
+  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!addEventConfig) {
@@ -211,12 +221,27 @@ export const AddEventBox = () => {
     }
     setStartDateTimeChange(addEventConfig?.debutTime);
     setEndDateTimeChange(addEventConfig?.finTime);
+    const searchGlobalUser = async () => {
+      try {
+        const res = await fetch(`/api/globalUsers`);
+        if (!res.ok) {
+          setListUsersForEvent([]);
+          return;
+        }
+        const data = await res.json();
+        console.log(data);
+        setListUsersForEvent(data);
+      } catch (error) {
+        setListUsersForEvent([]);
+      }
+    };
+    searchGlobalUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addEventConfig]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setAvailableUsers(
-      listUsers.filter(
+      listUsersForEvent.filter(
         (user) => !selectedUsers.some((selected) => selected.id === user.id)
       )
     );
@@ -291,7 +316,6 @@ export const AddEventBox = () => {
                 )}
                 {multipleUsers ? (
                   <div>
-                    <Label htmlFor="selectUsersList">Utilisateurs</Label>
                     <Select
                       id="selectUsersList"
                       onValueChange={handleUserSelection}
@@ -309,7 +333,8 @@ export const AddEventBox = () => {
                                   className="w-4 h-4 rounded-full mr-2"
                                   style={{ backgroundColor: user.color }}
                                 ></div>
-                                {user.username}
+                                {user.username}{" "}
+                                {user.exterieur ? "(exterieur)" : ""}
                               </div>
                             </SelectItem>
                           ))}
@@ -336,12 +361,11 @@ export const AddEventBox = () => {
                   </div>
                 ) : (
                   <div>
-                    <Label htmlFor="userSelect">Utilisateur</Label>
                     <Select
                       id="userSelect"
                       value={selectedUser?.id || ""}
                       onValueChange={(value) => {
-                        const userSelected = listUsers.find(
+                        const userSelected = listUsersForEvent.find(
                           (u) => u.id === value
                         );
                         if (userSelected) {
@@ -365,14 +389,15 @@ export const AddEventBox = () => {
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Utilisateurs</SelectLabel>
-                          {listUsers.map((user) => (
+                          {listUsersForEvent.map((user) => (
                             <SelectItem key={user.id} value={user.id}>
                               <div className="flex items-center">
                                 <div
                                   className="w-4 h-4 rounded-full mr-2"
                                   style={{ backgroundColor: user.color }}
                                 ></div>
-                                {user.username}
+                                {user.username}{" "}
+                                {user.exterieur ? "(exterieur)" : ""}
                               </div>
                             </SelectItem>
                           ))}
@@ -381,12 +406,19 @@ export const AddEventBox = () => {
                     </Select>
                   </div>
                 )}
-                <Button
-                  className="createUser text-blue-500 hover:text-blue-700"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  Ajouter un intervenant extérieur
-                </Button>
+                {multipleUsers ? (
+                  <Button
+                    className="createUser text-blue-500 hover:text-blue-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsCreateUserExterieurOpen(true);
+                    }}
+                  >
+                    Ajouter un intervenant extérieur
+                  </Button>
+                ) : (
+                  ""
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -397,48 +429,60 @@ export const AddEventBox = () => {
                 <Label htmlFor="fullDay">Journée entière</Label>
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="startDate">Date de début</Label>
-                <Input
-                  id="startDate"
-                  name="startDate"
-                  type="date"
-                  required
-                  value={addEventConfig?.debutAt || ""}
-                  onChange={(e) => setDebutAtInput(e.target.value)}
-                />
-                {!isFullDay && (
+                <Label htmlFor="startDate" className="text-nowrap mr-[.5vh]">
+                  Date de début
+                </Label>
+                <div className="flex">
                   <Input
-                    id="debutTime"
-                    name="debutTime"
-                    type="time"
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    className="w-[20vh] mr-[.5vh]"
                     required
-                    value={startDateTimeChange}
-                    onChange={(e) => setStartDateTimeChange(e.target.value)}
-                    onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
+                    value={addEventConfig?.debutAt || ""}
+                    onChange={(e) => setDebutAtInput(e.target.value)}
                   />
-                )}
+                  {!isFullDay && (
+                    <Input
+                      id="debutTime"
+                      name="debutTime"
+                      type="time"
+                      className="w-[10vh]"
+                      required
+                      value={startDateTimeChange}
+                      onChange={(e) => setStartDateTimeChange(e.target.value)}
+                      onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
+                    />
+                  )}
+                </div>
               </div>
               {!isFullDay && (
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="endDate">Date de fin</Label>
-                  <Input
-                    id="endDate"
-                    name="endDate"
-                    type="date"
-                    required
-                    value={addEventConfig?.finAt || ""}
-                    onChange={(e) => setFinAtInput(e.target.value)}
-                    min={addEventConfig?.debutAt}
-                  />
-                  <Input
-                    id="finTime"
-                    name="finTime"
-                    type="time"
-                    required
-                    value={endDateTimeChange}
-                    onChange={(e) => setEndDateTimeChange(e.target.value)}
-                    onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
-                  />
+                  <Label htmlFor="endDate" className="text-nowrap mr-[.5vh]">
+                    Date de fin
+                  </Label>
+                  <div className="flex">
+                    <Input
+                      id="endDate"
+                      name="endDate"
+                      type="date"
+                      className="w-[20vh] mr-[.5vh]"
+                      required
+                      value={addEventConfig?.finAt || ""}
+                      onChange={(e) => setFinAtInput(e.target.value)}
+                      min={addEventConfig?.debutAt}
+                    />
+                    <Input
+                      id="finTime"
+                      name="finTime"
+                      type="time"
+                      className="w-[10vh]"
+                      required
+                      value={endDateTimeChange}
+                      onChange={(e) => setEndDateTimeChange(e.target.value)}
+                      onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -457,6 +501,11 @@ export const AddEventBox = () => {
       <CreateUser
         isOpen={isCreateUserOpen}
         onClose={() => setIsCreateUserOpen(false)}
+      />
+      <CreateUserExterieur
+        isOpen={isCreateUserExterieurOpen}
+        onClose={() => setIsCreateUserExterieurOpen(false)}
+        setUserExterieur={(data) => setUserExterieurInEvent(data)}
       />
     </>
   );
