@@ -1,0 +1,21 @@
+{
+  "name": "RJ-Planning",
+  "short_name": "RJ-P",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0065F8",
+  "background_color": "#0065F8",
+  "start_url": "https://planning.rjinformatique.fr",
+  "display": "standalone",
+  "orientation": "portrait"
+}

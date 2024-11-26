@@ -40,7 +40,6 @@ export const LeftBar = () => {
           users.push(userRecup);
         }
       }
-
       setListUsers(users);
 
       const initialActiveUsers = {};
