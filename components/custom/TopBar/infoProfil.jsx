@@ -11,7 +11,6 @@ import { GlobalContext } from "@/lib/GlobalState";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import Cookies from "js-cookie";
 
 export const InfoProfil = ({ ...props }) => {
   const { me, isMobile, verifDroit } = useContext(GlobalContext);
@@ -54,7 +53,7 @@ export const InfoProfil = ({ ...props }) => {
         <DropdownMenuItem className="myProfil" onClick={handleProfil}>
           <User /> Mon Profil
         </DropdownMenuItem>
-        {verifDroit(me, [5]) && (
+        {verifDroit(me, [5, 1]) && (
           <DropdownMenuItem className="myProfil" onClick={handleDashboard}>
             <LayoutDashboard /> Dashboard
           </DropdownMenuItem>

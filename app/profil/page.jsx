@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useRouter } from "next/navigation";
+import "@/public/css/style.css";
 import {
   Dialog,
   DialogContent,
@@ -10,14 +13,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { GlobalContext } from "@/lib/GlobalState";
+import { TopBarControl } from "@/components/custom/dashboard/TopBarControl";
 
-export default function Profile() {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+export default function Profil() {
+  const router = useRouter();
+  const { me, setMe } = useContext(GlobalContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [editableUser, setEditableUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isPasswordChanging, setIsPasswordChanging] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -29,213 +32,172 @@ export default function Profile() {
     newPassword: false,
     confirmPassword: false,
   });
-  const [passwordError, setPasswordError] = useState(null); // To store the error message from the API
-  const router = useRouter();
+  const [passwordError, setPasswordError] = useState(null);
 
-  const verifyToken = async () => {
-    try {
-      const res = await fetch("/api/account/verify", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const [username, setUsername] = useState("");
+  const [color, setColor] = useState("");
 
-      if (!res.ok) {
-        throw new Error("Token invalide ou expiré");
+  const handlePasswordSubmit = () => {
+    console.log("handlePasswordSubmit");
+  };
+  const handleCancel = () => {
+    setUsername(me.username);
+    setColor(me.color);
+    setIsEditing(!isEditing);
+  };
+  const handleEditUser = async () => {
+    if (isEditing) {
+      const dateUpdateUser = {
+        username: username,
+        color: color,
+      };
+      console.log(dateUpdateUser);
+      try {
+        const res = await fetch(`/api/account/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dateUpdateUser),
+        });
+
+        if (!res.ok) {
+          throw new Error("Erreur lors de la mise à jour du profil");
+        }
+
+        const updatedUser = await res.json();
+        setMe({
+          ...me,
+          color: updatedUser.color,
+          username: updatedUser.username,
+        });
+        setIsEditing(false);
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du profil :", error);
       }
-
-      const data = await res.json();
-      setUser(data.user);
-      setEditableUser({ ...data.user });
-      setLoading(false);
-    } catch (error) {
-      router.push("/login");
     }
+    setIsEditing(!isEditing);
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    verifyToken();
+    const fetchMe = async () => {
+      try {
+        const res = await fetch("/api/account/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error("Redirection");
+        }
+
+        const data = await res.json();
+        setMe(data.user);
+      } catch (err) {
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditableUser((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancel = () => {
-    setEditableUser({ ...user });
-    setIsEditing(false);
-  };
-
-  const handleSave = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`/api/account/update`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editableUser),
-      });
-
-      if (!res.ok) {
-        throw new Error("Erreur lors de la mise à jour du profil");
-      }
-
-      const updatedUser = await res.json();
-      setUser(updatedUser);
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du profil :", error);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (me) {
+      setUsername(me.username);
+      setColor(me.color);
     }
-  };
-
-  const handlePasswordChange = () => {
-    setIsPasswordChanging(true);
-  };
-
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    setPasswordError(null); // Clear previous error
-
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("Les nouveaux mots de passe ne correspondent pas");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`/api/account/change-password`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(passwordForm),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log(errorData);
-
-        setPasswordError(
-          errorData.message || "Erreur lors du changement de mot de passe"
-        );
-        return;
-      }
-
-      alert("Mot de passe modifié avec succès");
-      setIsPasswordChanging(false);
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      console.error("Erreur lors du changement de mot de passe :", error);
-      setPasswordError("Erreur lors du changement de mot de passe");
-    }
-  };
-
-  if (loading) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me]);
+  if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        Chargement...
+      <div className="relative w-full h-full flex items-center justify-center">
+        <AiOutlineLoading3Quarters className="animate-spin" />
+        <p className="pl-3">Chargement</p>
       </div>
     );
-  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="absolute top-4 right-4">
-        <Link href="/" passHref>
-          <Button className="bg-gray-200 text-gray-600 hover:bg-gray-300">
-            Retour
-          </Button>
-        </Link>
-      </div>
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div className="flex items-center justify-center min-h-screen">
+      <TopBarControl />
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6">
-          {isEditing ? "Modifier Profil" : "Mon Profil"}
+          {isEditing ? "Modifier votre Profil" : "Mon Profil"}
         </h1>
         {isEditing ? (
           <>
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 dark:text-white">
+                    Nom d&apos;utilisateur
+                  </label>
+                  <Input
+                    name="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full border-gray-300 rounded-md"
+                  />
+                </div>
+              </div>
+            </form>
+          </>
+        ) : (
+          <div className="mb-4">
+            <p>Username: {username}</p>
+          </div>
+        )}
+        {isEditing ? (
+          <>
             <div className="mb-4">
-              <label className="block text-gray-700">
-                Nom d&apos;utilisateur
+              <label className="block text-gray-700 dark:text-white">
+                Couleur
               </label>
-              <Input
-                name="username"
-                value={editableUser.username}
-                onChange={handleChange}
-                className="w-full border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Couleur</label>
               <Input
                 name="color"
                 type="color"
-                value={editableUser.color}
-                onChange={handleChange}
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
                 className="w-full border-gray-300 rounded-md"
               />
             </div>
-            <div className="mb-4">
-              <Button
-                onClick={handlePasswordChange}
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700"
-              >
-                Changer le mot de passe
-              </Button>
-            </div>
-            <div className="flex justify-between">
-              <Button
-                className="w-full mr-2 bg-green-500 text-white py-2 rounded-md hover:bg-green-700"
-                onClick={handleSave}
-              >
-                Enregistrer
-              </Button>
-              <Button
-                className="w-full ml-2 bg-red-500 text-white py-2 rounded-md hover:bg-red-700"
-                onClick={handleCancel}
-              >
-                Annuler
-              </Button>
-            </div>
           </>
         ) : (
-          <>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {user.username}
-              </h2>
-            </div>
-            <div className="mb-4">
-              <p className="text-gray-600">Rôle: {user.role}</p>
-            </div>
-            <div className="mb-4 flex items-center">
-              <p className="text-gray-600">Couleur: </p>
-              <div
-                className="w-4 h-4 rounded-full ml-2"
-                style={{ backgroundColor: user.color }}
-              ></div>
-            </div>
-            <Button
-              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700"
-              onClick={handleEdit}
-            >
-              Modifier
-            </Button>
-          </>
+          <div className="mb-4">
+            <p className="flex items-center">
+              Couleur:
+              <span
+                className="w-[2vh] h-[2vh] spanColor"
+                style={{ background: color }}
+              ></span>
+            </p>
+          </div>
         )}
+        <div className="flex items-center mb-4 w-full justify-between">
+          <p className="mr-[1vh]">Mot de passe: </p>
+          <Button variant="outline" onClick={() => setIsPasswordChanging(true)}>
+            Modifer mon mot de passe
+          </Button>
+        </div>
+
+        <div className="flex">
+          {isEditing && (
+            <Button
+              variant="secondary"
+              className="w-[50%] mr-[.5vh]"
+              onClick={() => handleCancel()}
+            >
+              Annuler
+            </Button>
+          )}
+          <Button
+            className={isEditing ? "w-[50%] ml-[.5vh]" : "w-full"}
+            onClick={() => handleEditUser()}
+          >
+            {!isEditing ? "Modifier" : "Sauvgarder"}
+          </Button>
+        </div>
       </div>
 
       <Dialog open={isPasswordChanging} onOpenChange={setIsPasswordChanging}>
@@ -248,7 +210,9 @@ export default function Profile() {
               <p className="text-red-500 text-sm mb-4">{passwordError}</p>
             )}
             <div className="mb-4 relative w-full">
-              <label className="block text-gray-700">Mot de passe actuel</label>
+              <label className="block text-gray-700 dark:text-white">
+                Mot de passe actuel
+              </label>
               <div className="relative w-full">
                 <Input
                   name="currentPassword"
@@ -281,7 +245,7 @@ export default function Profile() {
               </div>
             </div>
             <div className="mb-4 relative w-full">
-              <label className="block text-gray-700">
+              <label className="block text-gray-700 dark:text-white">
                 Nouveau mot de passe
               </label>
               <div className="relative w-full">
@@ -316,7 +280,7 @@ export default function Profile() {
               </div>
             </div>
             <div className="mb-4 relative w-full">
-              <label className="block text-gray-700">
+              <label className="block text-gray-700 dark:text-white">
                 Confirmer le nouveau mot de passe
               </label>
               <div className="relative w-full">

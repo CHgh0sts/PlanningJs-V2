@@ -9,7 +9,7 @@ export function MyApp({ Component, pageProps }) {
   Router.events.on("routeChangeComplete", () => NProgress.done());
   Router.events.on("routeChangeError", () => NProgress.done());
   return (
-    <GlobalProvider initialIsMobile={pageProps.initialIsMobile}>
+    <GlobalProvider initialIsMobile={pageProps.initialIsMobile ?? false}>
       <Component {...pageProps} />
     </GlobalProvider>
   );

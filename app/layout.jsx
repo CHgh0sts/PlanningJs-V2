@@ -17,7 +17,7 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "PlanningJs",
-  description: "Cree et realiser par CHghosts",
+  description: "PLatform en ligne pour confiuger sont temps, facilement",
   themeColor: "#ffffff",
 };
 
