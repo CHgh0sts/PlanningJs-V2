@@ -25,7 +25,7 @@ export async function POST(request) {
             data: {
                 username,
                 color,
-                email,
+                email: email || null,
                 password: hashedPassword,
                 temp_password: password ? '' : tempPassword,
                 role: "1",

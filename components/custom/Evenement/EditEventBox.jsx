@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { CreateUser } from "./CreateUser";
+import { CreateUserExterieur } from "./CreateUserExterieur";
 import {
   Select,
   SelectContent,
@@ -45,6 +47,9 @@ export const EditEventBox = () => {
   );
   const [selectedUsers, setSelectedUsers] = useState([me]);
   const [multipleUsers, setMultipleUsers] = useState(false);
+  const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
+  const [isCreateUserExterieurOpen, setIsCreateUserExterieurOpen] =
+    useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [startDateTimeChange, setStartDateTimeChange] = useState(
     editEventConfig?.debutTime
@@ -250,257 +255,268 @@ export const EditEventBox = () => {
   }, [multipleUsers]);
 
   return (
-    <Dialog open={editEventConfig} onOpenChange={setEditEventConfig}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Modifier un événement</DialogTitle>
-          <DialogDescription>
-            Veuillez remplacer les détails de votre événement.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div>
-              <Label htmlFor="title">Titre</Label>
-              <div className="relative flex items-center">
-                <Input
-                  id="title"
-                  className=""
-                  name="title"
-                  placeholder="Titre de l'événement"
-                  value={title || ""}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="address">Adresse (facultatif)</Label>
-              <div className="relative flex items-center">
-                <Input
-                  id="address"
-                  className=""
-                  name="address"
-                  placeholder="Adresse de l'événement"
-                  value={address || ""}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <div className="relative">
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Description de l'événement (facultatif)"
-                  value={editEventConfig?.subtitle || ""}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            </div>
-            <Separator />
-            <div>
-              {me.listDroits && me.listDroits.includes(1) && (
-                <div className="flex items-center justify-between w-full space-x-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="multipleUsers"
-                      checked={multipleUsers}
-                      onCheckedChange={setMultipleUsers}
-                    />
-                    <Label htmlFor="multipleUsers">Mode groupe</Label>
-                  </div>
-                  <Button
-                    className="createUser text-blue-500 hover:text-blue-700"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsCreateUserOpen(true);
-                    }}
-                  >
-                    + Créer un utilisateur
-                  </Button>
-                </div>
-              )}
-              {multipleUsers ? (
-                <div>
-                  <Label>Utilisateurs</Label>
-                  <Select onValueChange={handleUserSelection}>
-                    <SelectTrigger>
-                      <SelectValue>Ajouter des utilisateurs</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Utilisateurs</SelectLabel>
-                        {availableUsers.map((user) => (
-                          <SelectItem key={user.id} value={user.id || ""}>
-                            <div className="flex items-center">
-                              <div
-                                className="w-4 h-4 rounded-full mr-2"
-                                style={{ backgroundColor: user.color }}
-                              ></div>
-                              {user.username}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <div className="userSelectedBox mt-2 flex w-full">
-                    {selectedUsers.map((user) => (
-                      <div
-                        style={{ borderColor: user.color, "--c": user.color }}
-                        key={user.id}
-                        className={`selectedUser flex items-center space-x-2`}
-                      >
-                        <span>{user.username}</span>
-                        <Button
-                          className="deleteUserSelected"
-                          onClick={() => handleRemoveUser(user.id)}
-                        >
-                          X
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <Label htmlFor="userSelect">Utilisateur</Label>
-                  <Select
-                    value={selectedUser?.id || ""}
-                    onValueChange={(value) => {
-                      const userSelected = listUsers.find(
-                        (u) => u.id === value
-                      );
-                      if (userSelected) {
-                        setSelectedUser(userSelected);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue>
-                        <div className="flex items-center">
-                          <div
-                            className="w-4 h-4 rounded-full mr-2"
-                            style={{
-                              backgroundColor: selectedUser?.color || "#000",
-                            }}
-                          ></div>
-                          {selectedUser?.username ||
-                            "Sélectionner un utilisateur"}
-                        </div>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Utilisateurs</SelectLabel>
-                        {listUsers.map((user) => (
-                          <SelectItem key={user.id} value={user.id || ""}>
-                            <div className="flex items-center">
-                              <div
-                                className="w-4 h-4 rounded-full mr-2"
-                                style={{ backgroundColor: user.color }}
-                              ></div>
-                              {user.username}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <Button
-                className="createUser text-blue-500 hover:text-blue-700"
-                onClick={(e) => e.preventDefault()}
-              >
-                Ajouter un intervenant extérieur
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="fullDay"
-                checked={isFullDay}
-                onCheckedChange={(checked) => setIsFullDay(checked === true)}
-              />
-              <Label htmlFor="fullDay">Journée entière</Label>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center justify-between w-full">
-                <Label htmlFor="startDate">Date de début</Label>
-                <Input
-                  id="startDate"
-                  className="col-span-3 w-[70%] justify-around mr-2"
-                  name="startDate"
-                  type="date"
-                  required
-                  value={editEventConfig?.debutAt || ""}
-                  onChange={(e) => setDebutAtInput(e.target.value)}
-                />
-              </div>
-              {!isFullDay && (
-                <div>
+    <>
+      <Dialog open={editEventConfig} onOpenChange={setEditEventConfig}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier un événement</DialogTitle>
+            <DialogDescription>
+              Veuillez remplacer les détails de votre événement.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div>
+                <Label htmlFor="title">Titre</Label>
+                <div className="relative flex items-center">
                   <Input
-                    id="debutTime"
-                    name="debutTime"
-                    type="time"
+                    id="title"
+                    className=""
+                    name="title"
+                    placeholder="Titre de l'événement"
+                    value={title || ""}
+                    onChange={(e) => setTitle(e.target.value)}
                     required
-                    value={startDateTimeChange}
-                    onChange={(e) => setStartDateTimeChange(e.target.value)}
-                    onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
                   />
                 </div>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              {!isFullDay && (
-                <>
-                  <div className="flex items-center justify-between w-full">
-                    <Label htmlFor="endDate">Date de fin</Label>
-                    <Input
-                      id="endDate"
-                      className="col-span-3 w-[70%] justify-around mr-2"
-                      name="endDate"
-                      type="date"
-                      required
-                      value={editEventConfig?.finAt || ""}
-                      onChange={(e) => setFinAtInput(e.target.value)}
-                      min={editEventConfig?.debutAt}
-                    />
+              </div>
+              <div>
+                <Label htmlFor="address">Adresse (facultatif)</Label>
+                <div className="relative flex items-center">
+                  <Input
+                    id="address"
+                    className=""
+                    name="address"
+                    placeholder="Adresse de l'événement"
+                    value={address || ""}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <div className="relative">
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Description de l'événement (facultatif)"
+                    value={editEventConfig?.subtitle || ""}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Separator />
+              <div>
+                {me.listDroits && me.listDroits.includes(1) && (
+                  <div className="flex items-center justify-between w-full space-x-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="multipleUsers"
+                        checked={multipleUsers}
+                        onCheckedChange={setMultipleUsers}
+                      />
+                      <Label htmlFor="multipleUsers">Mode groupe</Label>
+                    </div>
+                    <Button
+                      className="createUser text-blue-500 hover:text-blue-700"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsCreateUserOpen(true);
+                      }}
+                    >
+                      + Créer un utilisateur
+                    </Button>
                   </div>
+                )}
+                {multipleUsers ? (
+                  <div>
+                    <Label>Utilisateurs</Label>
+                    <Select onValueChange={handleUserSelection}>
+                      <SelectTrigger>
+                        <SelectValue>Ajouter des utilisateurs</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Utilisateurs</SelectLabel>
+                          {availableUsers.map((user) => (
+                            <SelectItem key={user.id} value={user.id || ""}>
+                              <div className="flex items-center">
+                                <div
+                                  className="w-4 h-4 rounded-full mr-2"
+                                  style={{ backgroundColor: user.color }}
+                                ></div>
+                                {user.username}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <div className="userSelectedBox mt-2 flex w-full">
+                      {selectedUsers.map((user) => (
+                        <div
+                          style={{ borderColor: user.color, "--c": user.color }}
+                          key={user.id}
+                          className={`selectedUser flex items-center space-x-2`}
+                        >
+                          <span>{user.username}</span>
+                          <Button
+                            className="deleteUserSelected"
+                            onClick={() => handleRemoveUser(user.id)}
+                          >
+                            X
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="userSelect">Utilisateur</Label>
+                    <Select
+                      value={selectedUser?.id || ""}
+                      onValueChange={(value) => {
+                        const userSelected = listUsers.find(
+                          (u) => u.id === value
+                        );
+                        if (userSelected) {
+                          setSelectedUser(userSelected);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue>
+                          <div className="flex items-center">
+                            <div
+                              className="w-4 h-4 rounded-full mr-2"
+                              style={{
+                                backgroundColor: selectedUser?.color || "#000",
+                              }}
+                            ></div>
+                            {selectedUser?.username ||
+                              "Sélectionner un utilisateur"}
+                          </div>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Utilisateurs</SelectLabel>
+                          {listUsers.map((user) => (
+                            <SelectItem key={user.id} value={user.id || ""}>
+                              <div className="flex items-center">
+                                <div
+                                  className="w-4 h-4 rounded-full mr-2"
+                                  style={{ backgroundColor: user.color }}
+                                ></div>
+                                {user.username}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <Button
+                  className="createUser text-blue-500 hover:text-blue-700"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Ajouter un intervenant extérieur
+                </Button>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="fullDay"
+                  checked={isFullDay}
+                  onCheckedChange={(checked) => setIsFullDay(checked === true)}
+                />
+                <Label htmlFor="fullDay">Journée entière</Label>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between w-full">
+                  <Label htmlFor="startDate">Date de début</Label>
+                  <Input
+                    id="startDate"
+                    className="col-span-3 w-[70%] justify-around mr-2"
+                    name="startDate"
+                    type="date"
+                    required
+                    value={editEventConfig?.debutAt || ""}
+                    onChange={(e) => setDebutAtInput(e.target.value)}
+                  />
+                </div>
+                {!isFullDay && (
                   <div>
                     <Input
-                      id="finTime"
-                      name="finTime"
+                      id="debutTime"
+                      name="debutTime"
                       type="time"
                       required
-                      value={endDateTimeChange}
-                      onChange={(e) => setEndDateTimeChange(e.target.value)}
-                      onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
+                      value={startDateTimeChange}
+                      onChange={(e) => setStartDateTimeChange(e.target.value)}
+                      onBlur={(e) => handleStartDateTimeBlur(e.target.value)}
                     />
                   </div>
-                </>
-              )}
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                {!isFullDay && (
+                  <>
+                    <div className="flex items-center justify-between w-full">
+                      <Label htmlFor="endDate">Date de fin</Label>
+                      <Input
+                        id="endDate"
+                        className="col-span-3 w-[70%] justify-around mr-2"
+                        name="endDate"
+                        type="date"
+                        required
+                        value={editEventConfig?.finAt || ""}
+                        onChange={(e) => setFinAtInput(e.target.value)}
+                        min={editEventConfig?.debutAt}
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        id="finTime"
+                        name="finTime"
+                        type="time"
+                        required
+                        value={endDateTimeChange}
+                        onChange={(e) => setEndDateTimeChange(e.target.value)}
+                        onBlur={(e) => handleEndDateTimeBlur(e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="secondary"
-              onClick={(event) => closeEditEvent(event)}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={(e) => deleteEvent(e, editEventConfig)}
-            >
-              Supprimer l&apos;événement
-            </Button>
-            <Button type="submit">Modifer l&apos;événement</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={(event) => closeEditEvent(event)}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={(e) => deleteEvent(e, editEventConfig)}
+              >
+                Supprimer l&apos;événement
+              </Button>
+              <Button type="submit">Modifer l&apos;événement</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <CreateUser
+        isOpen={isCreateUserOpen}
+        onClose={() => setIsCreateUserOpen(false)}
+      />
+      <CreateUserExterieur
+        isOpen={isCreateUserExterieurOpen}
+        onClose={() => setIsCreateUserExterieurOpen(false)}
+        setUserExterieur={(data) => setUserExterieurInEvent(data)}
+      />
+    </>
   );
 };

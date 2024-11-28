@@ -293,27 +293,28 @@ export const AddEventBox = () => {
               </div>
               <Separator />
               <div>
-                {me.listDroits && me.listDroits.includes(1) && (
-                  <div className="flex items-center justify-between w-full space-x-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="multipleUsers"
-                        checked={multipleUsers}
-                        onCheckedChange={setMultipleUsers}
-                      />
-                      <Label htmlFor="multipleUsers">Mode groupe</Label>
+                {me.listDroits &&
+                  (me.listDroits.includes(0) || me.listDroits.includes(1)) && (
+                    <div className="flex items-center justify-between w-full space-x-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="multipleUsers"
+                          checked={multipleUsers}
+                          onCheckedChange={setMultipleUsers}
+                        />
+                        <Label htmlFor="multipleUsers">Mode groupe</Label>
+                      </div>
+                      <Button
+                        className="createUser text-blue-500 hover:text-blue-700"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsCreateUserOpen(true);
+                        }}
+                      >
+                        + Créer un utilisateur
+                      </Button>
                     </div>
-                    <Button
-                      className="createUser text-blue-500 hover:text-blue-700"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsCreateUserOpen(true);
-                      }}
-                    >
-                      + Créer un utilisateur
-                    </Button>
-                  </div>
-                )}
+                  )}
                 {multipleUsers ? (
                   <div>
                     <Select
