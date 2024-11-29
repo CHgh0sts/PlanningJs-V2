@@ -272,7 +272,7 @@ body {
   border-radius: 5vh;
 }
 .topBarCallendar {
-  position: sticky;
+  position: absolute;
   width: 100%;
   top: 0;
   height: 5vh;

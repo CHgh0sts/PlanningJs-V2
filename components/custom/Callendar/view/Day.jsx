@@ -227,7 +227,7 @@ export const Day = () => {
   }, [actualDate]);
 
   return (
-    <div className="p-1 w-full h-[88vh] flex">
+    <div className="p-1 w-full mt-[6.5vh] h-[88vh] flex">
       <div className="flex relative w-full h-full overflow-x-hidden">
         <div className="listHeure w-[3rem] flex flex-col">
           {renderHourLabels()}

@@ -187,7 +187,7 @@ export const Month = () => {
   }, [actualDate]);
 
   return (
-    <div className="p-1 w-full h-[88vh] flex">
+    <div className="p-1 w-full h-[88vh] mt-[6.5vh] flex">
       <div className="flex relative w-full h-[87vh] flex-col">
         <div className={`grid grid-cols-7 grid-rows-${nbtLigne} h-full w-full`}>
           {calendarData.map((dayInfo, index) => (

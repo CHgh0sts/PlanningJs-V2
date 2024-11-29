@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, CalendarCheck } from "lucide-react";
 import { GlobalContext } from "@/lib/GlobalState";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -111,7 +111,7 @@ export const CallendarTopBar = () => {
           onClick={() => setActualDate(new Date())}
           className="btn btn-icon inDay"
         >
-          Aujourd&apos;hui
+          {isMobile ? <CalendarCheck /> : "Aujourd'hui"}
         </Button>
         <Button
           variant="secondary"
