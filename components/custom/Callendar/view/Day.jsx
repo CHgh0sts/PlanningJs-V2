@@ -155,15 +155,15 @@ export const Day = () => {
     const today = new Date();
 
     const isToday =
-      currentDate.getFullYear() === today.getFullYear() &&
-      currentDate.getMonth() === today.getMonth() &&
-      currentDate.getDate() === today.getDate();
+      startOfDay.getFullYear() === today.getFullYear() &&
+      startOfDay.getMonth() === today.getMonth() &&
+      startOfDay.getDate() === today.getDate();
 
     return [
       {
         date: startOfDay,
         day: startOfDay.getDate(),
-        weekday: currentDate.toLocaleDateString("fr-FR", { weekday: "long" }),
+        weekday: startOfDay.toLocaleDateString("fr-FR", { weekday: "long" }),
         isCurrentMonth: true,
         isToday,
         events: [],

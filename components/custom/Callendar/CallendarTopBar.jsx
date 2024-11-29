@@ -3,6 +3,8 @@ import { useContext, useEffect, useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { GlobalContext } from "@/lib/GlobalState";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 export const CallendarTopBar = () => {
   const {
     actualDate,
@@ -66,6 +68,9 @@ export const CallendarTopBar = () => {
       setActualDate(new Date(nextDayDate));
     }
   };
+  const handlePickDate = (val) => {
+    setActualDate(new Date(val));
+  };
 
   const formatWeekRange = (date) => {
     const startOfWeek = new Date(date);
@@ -123,21 +128,53 @@ export const CallendarTopBar = () => {
           <ChevronDown />
         </Button>
         {typeView === "month" && (
-          <span className="month">
-            {mois[actualDate.getMonth()]} {actualDate.getFullYear()}
-          </span>
+          <div className="relative">
+            <Label className="month" htmlFor="datepick">
+              {mois[actualDate.getMonth()]} {actualDate.getFullYear()}
+            </Label>
+            <Input
+              id="datepick"
+              name="datepick"
+              type="date"
+              className="inputNone"
+              value={actualDate}
+              onChange={(e) => handlePickDate(e.target.value)}
+            />
+          </div>
         )}
         {typeView === "week" && (
-          <span className="week">{formatWeekRange(actualDate)}</span>
+          <div className="relative">
+            <Label className="week" htmlFor="datepick">
+              {formatWeekRange(actualDate)}
+            </Label>
+            <Input
+              id="datepick"
+              name="datepick"
+              type="date"
+              className="inputNone"
+              value={actualDate}
+              onChange={(e) => handlePickDate(e.target.value)}
+            />
+          </div>
         )}
         {typeView === "day" && (
-          <span className="day">
-            {`${actualDate.getDate().toString().padStart(2, "0")}/${(
-              actualDate.getMonth() + 1
-            )
-              .toString()
-              .padStart(2, "0")}/${actualDate.getFullYear()}`}
-          </span>
+          <div className="relative">
+            <Label className="day" htmlFor="datepick">
+              {`${actualDate.getDate().toString().padStart(2, "0")}/${(
+                actualDate.getMonth() + 1
+              )
+                .toString()
+                .padStart(2, "0")}/${actualDate.getFullYear()}`}
+            </Label>
+            <Input
+              id="datepick"
+              name="datepick"
+              type="date"
+              className="inputNone"
+              value={actualDate}
+              onChange={(e) => handlePickDate(e.target.value)}
+            />
+          </div>
         )}
       </div>
       <div className="right">

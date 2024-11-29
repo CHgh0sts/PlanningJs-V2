@@ -492,3 +492,19 @@ ul.listUsers li:nth-child(2n) {
   position: relative;
   height: 100%;
 }
+.inputNone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.inputNone::-webkit-calendar-picker-indicator {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
