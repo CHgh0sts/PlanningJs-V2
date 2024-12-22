@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_EXT")
 }
 
 model Event {
@@ -17,6 +17,7 @@ model Event {
   finAt     DateTime
   fullDay   Boolean  @default(false)
   userId    String
+  typeEvent String?  @default("1 fois")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

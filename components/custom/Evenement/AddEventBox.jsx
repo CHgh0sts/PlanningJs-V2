@@ -44,6 +44,7 @@ export const AddEventBox = () => {
   } = useContext(GlobalContext);
 
   const [title, setTitle] = useState(addEventConfig?.title);
+  const [repetition, setRepetition] = useState("once");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
 
@@ -421,13 +422,46 @@ export const AddEventBox = () => {
                   ""
                 )}
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="fullDay"
-                  checked={isFullDay}
-                  onCheckedChange={(checked) => setIsFullDay(checked === true)}
-                />
-                <Label htmlFor="fullDay">Journée entière</Label>
+              <div className="flex items-center space-x-2 justify-between">
+                <div className="flex items-center flex-nowrap">
+                  <p className="mr-[.5vh]">Répété:</p>
+                  <Select
+                    id="typeEventSelect"
+                    value={repetition}
+                    onValueChange={setRepetition}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un type de répétition">
+                        {repetition === "once" ? "1 fois" : repetition}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="once">1 fois</SelectItem>
+                      <SelectItem value="1 fois par semaine">
+                        1 fois par semaine
+                      </SelectItem>
+                      <SelectItem value="1 semaine sur 2">
+                        1 semaine sur 2
+                      </SelectItem>
+                      <SelectItem value="1 fois par mois">
+                        1 fois par mois
+                      </SelectItem>
+                      <SelectItem value="pendant une période">
+                        pendant une période
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center">
+                  <Checkbox
+                    id="fullDay"
+                    checked={isFullDay}
+                    onCheckedChange={(checked) =>
+                      setIsFullDay(checked === true)
+                    }
+                  />
+                  <Label htmlFor="fullDay">Journée entière</Label>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="startDate" className="text-nowrap mr-[.5vh]">

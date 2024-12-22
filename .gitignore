@@ -39,4 +39,5 @@ node_modules
 node_modules
 
 # prisma
-./prisma/dev.db
+/prisma/*
+!/prisma/schema.prisma
