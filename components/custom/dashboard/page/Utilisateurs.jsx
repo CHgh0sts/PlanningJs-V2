@@ -3,7 +3,7 @@ import { GlobalContext } from "@/lib/GlobalState";
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Trash, ShieldPlus } from "lucide-react";
-import { handleAction } from "@/app/actions/userActions";
+import { handleAction } from "@/app/actions/handleActions";
 
 export const Utilisateurs = () => {
   const { me } = useContext(GlobalContext);
