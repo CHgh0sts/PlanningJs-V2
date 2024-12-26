@@ -39,8 +39,3 @@ next-env.d.ts
 node_modules
 node_modules
 node_modules
-
-# prisma
-/prisma/*
-!/prisma/prisma-global/schema.prisma
-!/prisma/prisma-project/schema.prisma
