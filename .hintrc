@@ -8,7 +8,8 @@
       {
         "ignore": [
           "text-wrap",
-          "text-wrap: nowrap"
+          "text-wrap: nowrap",
+          "user-select"
         ]
       }
     ]

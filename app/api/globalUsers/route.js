@@ -1,20 +1,31 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 export async function GET(req) {
   try {
     
-    const response = await prisma.user.findMany({
+    let response = await globalPrisma.user.findMany({
         select: {
           id: true,
           username: true,
-          role: true,
-          color: true,
-          exterieur: true,
+          userId: true,
         },
     });
+
+    const filteredResponse = await Promise.all(
+      response.map(async (user) => {
+        const parrams = await projectPrisma.userParrams.findUnique({
+          where: { userId: user.userId },
+        });
+        if (!parrams) {
+          return null;
+        }
+        Object.assign(user, parrams);
+        return user;
+      })
+    );
+    response = filteredResponse.filter((user) => user !== null);
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {

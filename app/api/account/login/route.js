@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 export async function POST(req) {
   const { username, password } = await req.json();
@@ -13,7 +12,7 @@ export async function POST(req) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await globalPrisma.user.findUnique({
       where: { username },
     });
 
@@ -21,11 +20,19 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
     }
 
-    const isPasswordValid = user.password ? await bcrypt.compare(password.trim(), user.password) : false;
-    const isTempPasswordValid = await bcrypt.compare(password.trim(), user.temp_password);
+    let isPasswordValid = false;
+    let isTempPasswordValid = false;
+
+    // Vérifiez si les champs password et temp_password existent avant la comparaison
+    if (user.password) {
+      isPasswordValid = await bcrypt.compare(password.trim(), user.password);
+    }
+    if (user.temp_password) {
+      isTempPasswordValid = await bcrypt.compare(password.trim(), user.temp_password);
+    }
 
     if (!isPasswordValid && !isTempPasswordValid) {
-      return NextResponse.json({ error: 'Identifiants ou Mot de passe incorrects' }, { status: 401 });
+      return NextResponse.json({ error: 'Identifiants ou mot de passe incorrects' }, { status: 401 });
     }
 
     const token = jwt.sign(
@@ -43,15 +50,15 @@ export async function POST(req) {
     // Définir le cookie avec le token JWT
     response.cookies.set('authToken', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Secure uniquement en production
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 3600, // 1 heure
+      maxAge: 3600,
       path: '/',
     });
 
     return response;
   } catch (error) {
-    console.error('Erreur lors de la connexion :', error);
+    console.error('Erreur lors de la connexion :', error.message, error.stack);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

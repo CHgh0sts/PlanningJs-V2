@@ -1,8 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 export async function POST(request) {
     const genererChaineAleatoire = (longueur) => {
@@ -13,23 +12,27 @@ export async function POST(request) {
         }
         return chaine;
     };
-
+    const genererNombreAleatoire = (longueur) => {
+        const max = Math.pow(10, longueur) - 1; // Le plus grand nombre avec "longueur" chiffres
+        const nombreAleatoire = Math.floor(Math.random() * (max + 1)); // Nombre aléatoire entre 0 et max
+        return nombreAleatoire.toString().padStart(longueur, '0'); // Ajoute des zéros à gauche si nécessaire
+    };
+    
     try {
         const body = await request.json();
         const { username, email, color, password } = body;
 
         const tempPassword = password || genererChaineAleatoire(8);
+        const userId = genererNombreAleatoire(10);
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-        // Création d'utilisateur
-        const newUser = await prisma.user.create({
+        const newUser = await globalPrisma.user.create({
             data: {
                 username,
-                color,
+                userId: userId,
                 email: email || null,
                 password: hashedPassword,
-                temp_password: password ? '' : tempPassword,
-                role: "1",
+                tempPassword: password ? '' : tempPassword,
             },
         });
 
@@ -53,6 +56,6 @@ export async function POST(request) {
             { status: 500 }
         );
     } finally {
-        await prisma.$disconnect();
+        await globalPrisma.$disconnect();
     }
 }

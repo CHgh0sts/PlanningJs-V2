@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -12,7 +9,7 @@ export async function GET(request) {
     let users;
 
     if (username && username.trim() !== '') {
-      users = await prisma.user.findMany({
+      users = await globalPrisma.user.findMany({
         where: {
           username: {
             contains: username,
@@ -20,8 +17,22 @@ export async function GET(request) {
         },
       });
     } else {
-      users = await prisma.user.findMany();
+      users = await globalPrisma.user.findMany();
     }
+
+    const filteredResponse = await Promise.all(
+      users.map(async (user) => {
+        const parrams = await projectPrisma.userParrams.findUnique({
+          where: { userId: user.userId },
+        });
+        if (!parrams) {
+          return null;
+        }
+        Object.assign(user, parrams);
+        return user;
+      })
+    );
+    users = filteredResponse.filter((user) => user !== null);
     return NextResponse.json({ users }, { status: 200 });
   } catch (error) {
     console.error('Erreur côté serveur:', error);

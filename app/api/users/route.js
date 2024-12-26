@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 const generateRandomPassword = (longueur = 8) => {
   const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -20,29 +19,49 @@ export async function GET(req) {
     let response;
 
     if (userId) {
-      response = await prisma.user.findUnique({
-        where: { id: parseInt(userId, 10), exterieur: false },
+      response = await globalPrisma.user.findUnique({
+        where: { id: parseInt(userId, 10) },
         select: {
           id: true,
           username: true,
-          role: true,
-          color: true,
+          userId: true
         },
       });
+
+      let parrams = await projectPrisma.userParrams.findUnique({
+        where: {userId: response.userId}
+      })
+  
+      if(!parrams) {
+        return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 });
+      };
+  
+      Object.assign(response, parrams);
 
       if (!response) {
         return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 });
       }
     } else {
-      response = await prisma.user.findMany({
-        where: { exterieur: false },
+      response = await globalPrisma.user.findMany({
         select: {
           id: true,
           username: true,
-          role: true,
-          color: true,
+          userId: true
         },
       });
+        const filteredResponse = await Promise.all(
+        response.map(async (user) => {
+          const parrams = await projectPrisma.userParrams.findUnique({
+            where: { userId: user.userId },
+          });
+          if (!parrams) {
+            return null;
+          }
+          Object.assign(user, parrams);
+          return user;
+        })
+      );
+      response = filteredResponse.filter((user) => user !== null);      
     }
 
     return NextResponse.json(response, { status: 200 });

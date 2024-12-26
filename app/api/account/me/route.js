@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { globalPrisma, projectPrisma } from '@/lib/prisma';
 
 export async function GET(req) {
   const token = req.cookies.get('authToken');
@@ -14,30 +12,41 @@ export async function GET(req) {
   try {
     const decoded = jwt.verify(token.value, process.env.JWT_SECRET);
 
-    const user = await prisma.user.findUnique({
+    const user = await globalPrisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
         id: true,
         username: true,
         email: true,
-        role: true,
-        color: true,
+        userId: true
       },
     });
 
-    if (!user || !user.role) {
+    if (!user) {
       return NextResponse.json({ error: 'Utilisateur introuvable ou rôle manquant' }, { status: 404 });
     }
-
-    // Vérifier et convertir `user.role` en tableau d'IDs
+    try {
+      let parrams = await projectPrisma.userParrams.findUnique({
+        where: {userId: user.userId}
+      })
+      if(!parrams) {
+        parrams = await projectPrisma.userParrams.create({
+          data: {
+              userId: user.userId
+          },
+      });
+      }
+      Object.assign(user, parrams);
+    } catch (error) {
+      return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 404 });
+    }
     const roleIds = user.role.split('/').map(Number).filter(Boolean);
 
     if (roleIds.length !== 0) {
       
     }
 
-    // Récupération des grades par IDs
-    const grades = await prisma.grade.findMany({
+    const grades = await projectPrisma.grade.findMany({
       where: { id: { in: roleIds } },
       select: { listDroit: true },
     });
@@ -62,7 +71,7 @@ export async function GET(req) {
 
     user.listDroits = Array.from(uniqueDroits);
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
     console.error('Erreur JWT ou serveur :', error);
     return NextResponse.json({ error: 'Token invalide ou expiré' }, { status: 401 });
