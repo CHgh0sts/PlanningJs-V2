@@ -4,8 +4,9 @@ datasource globalDB {
 }
 
 generator globalClient {
-  provider = "prisma-client-js"
-  output   = "./prisma-global"
+  provider      = "prisma-client-js"
+  output        = "./prisma-global"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 model User {
