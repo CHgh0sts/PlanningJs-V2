@@ -6,8 +6,9 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "prisma:generate": "npx prisma generate --schema=./prisma/project.prisma && npx prisma generate --schema=./prisma/global.prisma",
-    "build": "npm run prisma:generate && next build"
+    "prisma:sync": "prisma db push --schema=./prisma/project.prisma && prisma db push --schema=./prisma/global.prisma",
+    "prisma:generate": "prisma generate --schema=./prisma/project.prisma && prisma generate --schema=./prisma/global.prisma",
+    "build": "npm run prisma:sync && npm run prisma:generate && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
