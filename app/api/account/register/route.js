@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
-import { globalPrisma, projectPrisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export async function POST(request) {
     const genererChaineAleatoire = (longueur) => {
@@ -26,7 +26,7 @@ export async function POST(request) {
         const userId = genererNombreAleatoire(10);
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-        const newUser = await globalPrisma.user.create({
+        const newUser = await prisma.user.create({
             data: {
                 username,
                 userId: userId,
@@ -35,6 +35,15 @@ export async function POST(request) {
                 tempPassword: password ? '' : tempPassword,
             },
         });
+        let colorString = String(color)
+        const newUserParrams = await prisma.userParrams.create({
+            data: {
+                userId: userId,
+                role: "1",
+                color: colorString
+            }
+        })
+        Object.assign(newUser, newUserParrams);
 
         return NextResponse.json(
             { user: newUser, tempPassword: password ? null : tempPassword },
@@ -56,6 +65,6 @@ export async function POST(request) {
             { status: 500 }
         );
     } finally {
-        await globalPrisma.$disconnect();
+        await prisma.$disconnect();
     }
 }

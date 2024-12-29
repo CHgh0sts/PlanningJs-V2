@@ -415,7 +415,8 @@ body {
 .selectedUser {
   border: 0.15vh solid var(--c);
   border-radius: 1vh;
-  padding: 0 1vh;
+  padding-left: 1vh;
+  padding-right: .5vh;
   margin: 0.5vh;
 }
 .userSelectedBox {

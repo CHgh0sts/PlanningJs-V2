@@ -37,6 +37,8 @@ export const EditEventBox = () => {
     listUsers,
     listEvents,
     setListEvents,
+    listUsersForEvent,
+    setListUsersForEvent,
   } = useContext(GlobalContext);
 
   const [title, setTitle] = useState(editEventConfig?.title);
@@ -228,6 +230,18 @@ export const EditEventBox = () => {
     }
     setEndDateTimeChange(rearengedTimeEnd);
   }
+  const handleUserSelection = (userId) => {
+    const userSelected = listUsersForEvent.find((u) => u.id === userId);
+    if (
+      userSelected &&
+      !selectedUsers.some((user) => user.id === userSelected.id)
+    ) {
+      setSelectedUsers([...selectedUsers, userSelected]);
+      setAvailableUsers(
+        availableUsers.filter((user) => user.id !== userSelected.id)
+      );
+    }
+  };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!editEventConfig) {

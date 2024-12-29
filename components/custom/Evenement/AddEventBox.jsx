@@ -347,7 +347,7 @@ export const AddEventBox = () => {
                       {selectedUsers.map((user) => (
                         <div
                           key={user.id}
-                          style={{ borderColor: user.color }}
+                          style={{ borderColor: user.color, "--c": user.color }}
                           className="selectedUser flex items-center space-x-2"
                         >
                           <span>{user.username}</span>
