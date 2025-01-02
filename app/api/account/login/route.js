@@ -54,6 +54,7 @@ export async function POST(req) {
       sameSite: 'strict',
       maxAge: 3600,
       path: '/',
+      domain: '.rjinformatique.fr',
     });
 
     return response;
